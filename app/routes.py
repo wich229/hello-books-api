@@ -14,10 +14,10 @@ books = [
         ] 
 
 
-book_dp = Blueprint("books", __name__,  url_prefix="/books")
+book_bp = Blueprint("books", __name__,  url_prefix="/books")
 
 
-@ book_dp.route("", methods = ["GET"])
+@ book_bp.route("", methods = ["GET"])
 def book_lists():
     books_response = []
     for book in books:
@@ -29,3 +29,14 @@ def book_lists():
             }
         )
     return jsonify(books_response)
+
+@ book_bp.route("/<book_id>", methods = ["GET"])
+def handle_book_by_id(book_id):
+    book_id =int(book_id)
+    for book in books:
+        if book.id == book_id:
+            return { 
+                "id": book.id,
+                "title": book.title,
+                "author": book.description
+            }
