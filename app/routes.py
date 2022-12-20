@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify
+from flask import Blueprint, jsonify, abort, make_response
 
 class Book:
     def __init__(self, id, title, description):
@@ -30,13 +30,26 @@ def book_lists():
         )
     return jsonify(books_response)
 
-@ book_bp.route("/<book_id>", methods = ["GET"])
-def handle_book_by_id(book_id):
-    book_id =int(book_id)
+
+def validate_book(book_id):
+    try:
+        book_id =int(book_id)
+    except:
+        abort(make_response({"msg" : f" book {book_id} invalid."}, 400))
+    
     for book in books:
         if book.id == book_id:
-            return { 
-                "id": book.id,
-                "title": book.title,
-                "author": book.description
-            }
+            return book
+            
+    abort(make_response({"msg" : f" book {book_id} not found"}, 404))
+    
+
+
+@ book_bp.route("/<book_id>", methods = ["GET"])
+def handle_book_by_id(book_id):
+    book = validate_book(book_id)
+    return { 
+        "id": book.id,
+        "title": book.title,
+        "author": book.description
+    }
