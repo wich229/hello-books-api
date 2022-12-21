@@ -1,23 +1,28 @@
-# from flask import Blueprint, jsonify, abort, make_response
+from app import db
+from app.models.book import Book
+from flask import Blueprint, request, jsonify, abort, make_response
 
-# class Book:
-#     def __init__(self, id, title, description):
-#         self.id = id
-#         self.title = title
-#         self.description = description
-        
-        
-# books = [
-#             Book(1, "Fictional Book Title", "A fantasy novel set in an imaginary world."),
-#             Book(2, "Fictional Book Title", "A fantasy novel set in an imaginary world."),
-#             Book(3, "Fictional Book Title", "A fantasy novel set in an imaginary world.")
-#         ] 
+#routes.py
 
 
-# book_bp = Blueprint("books", __name__,  url_prefix="/books")
+books_bp = Blueprint("books_bp", __name__,  url_prefix="/books")
+
+@books_bp.route("", methods = ["POST"])
+def handle_books():
+    request_body = request.get_json()
+    new_book = Book(
+                    # id = request_body["id"],
+                    title = request_body["title"],
+                    description = request_body["description"]
+                    )
+    
+    db.session.add(new_book)
+    db.session.commit()
+    
+    return make_response(f"Book {new_book.title} successfully created", 201)
 
 
-# @ book_bp.route("", methods = ["GET"])
+# @ books_bp.route("", methods = ["GET"])
 # def book_lists():
 #     books_response = []
 #     for book in books:
@@ -45,7 +50,7 @@
     
 
 
-# @ book_bp.route("/<book_id>", methods = ["GET"])
+# @ books_bp.route("/<book_id>", methods = ["GET"])
 # def handle_book_by_id(book_id):
 #     book = validate_book(book_id)
 #     return { 
