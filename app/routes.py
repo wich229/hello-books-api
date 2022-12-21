@@ -78,6 +78,21 @@ def update_one_book(book_id):
     
     return make_response(f"Book #{book.id} successfully updated", 200)
 
+
+# Delete_one_book
+@books_bp.route("/<book_id>", methods=["DELETE"])
+def delete_book(book_id):
+    book = validate_book(book_id)
+
+    db.session.delete(book)
+    db.session.commit()
+
+    return make_response(f"Book #{book.id} successfully deleted")
+
+
+
+# hard code data version--------------------------
+
 # @ books_bp.route("", methods = ["GET"])
 # def book_lists():
 #     books_response = []
