@@ -5,6 +5,7 @@ from flask import Blueprint, request, jsonify, abort, make_response
 
 books_bp = Blueprint("books_bp", __name__,  url_prefix="/books")
 
+
 # create
 @ books_bp.route("", methods = ["POST"])
 def create_book():
@@ -19,6 +20,7 @@ def create_book():
     db.session.commit()
     
     return make_response(f"Book {new_book.title} successfully created", 201)
+
 
 # read books
 @ books_bp.route("", methods = ["GET"])
@@ -50,6 +52,7 @@ def validate_book(book_id):
         
     abort(make_response({"msg" : f" book {book_id} not found"}, 404))
 
+
 # Read_one_book
 @books_bp.route("/<book_id>", methods=["GET"])
 def read_one_book(book_id):
@@ -59,7 +62,21 @@ def read_one_book(book_id):
             "title": book.title,
             "description": book.description
         }
+    
 
+# Updated_one_book
+@books_bp.route("/<book_id>", methods=["PUT"])
+def update_one_book(book_id):
+    book = validate_book(book_id)
+    
+    request_body = request.get_json()
+    
+    book.title = request_body["title"]
+    book.description = request_body["description"]
+
+    db.session.commit()
+    
+    return make_response(f"Book #{book.id} successfully updated", 200)
 
 # @ books_bp.route("", methods = ["GET"])
 # def book_lists():
