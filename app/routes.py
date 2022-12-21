@@ -20,7 +20,7 @@ def create_book():
     
     return make_response(f"Book {new_book.title} successfully created", 201)
 
-
+# read books
 @ books_bp.route("", methods = ["GET"])
 def handle_books():
     books = Book.query.all() # will return a list of instances of books
@@ -34,7 +34,32 @@ def handle_books():
             }
         )
     return jsonify(books_response)
+
+
+# helper function to check book_id
+def validate_book(book_id):
+    try:
+        book_id = int(book_id)
+    except:
+        abort(make_response({"msg" : f" book {book_id} invalid."}, 400))
     
+    book = Book.query.get(book_id)
+    
+    if book:
+        return book
+        
+    abort(make_response({"msg" : f" book {book_id} not found"}, 404))
+
+# Read_one_book
+@books_bp.route("/<book_id>", methods=["GET"])
+def read_one_book(book_id):
+    book = validate_book(book_id)
+    return {
+            "id": book.id,
+            "title": book.title,
+            "description": book.description
+        }
+
 
 # @ books_bp.route("", methods = ["GET"])
 # def book_lists():
@@ -48,20 +73,6 @@ def handle_books():
 #             }
 #         )
 #     return jsonify(books_response)
-
-
-# def validate_book(book_id):
-#     try:
-#         book_id =int(book_id)
-#     except:
-#         abort(make_response({"msg" : f" book {book_id} invalid."}, 400))
-    
-#     for book in books:
-#         if book.id == book_id:
-#             return book
-            
-#     abort(make_response({"msg" : f" book {book_id} not found"}, 404))
-    
 
 
 # @ books_bp.route("/<book_id>", methods = ["GET"])
