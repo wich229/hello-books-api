@@ -3,7 +3,7 @@ from app.models.book import Book
 from flask import Blueprint, request, jsonify, abort, make_response
 
 
-books_bp = Blueprint("books_bp", __name__,  url_prefix="/books")
+books_bp = Blueprint("books", __name__,  url_prefix="/books")
 
 
 # create
@@ -23,9 +23,58 @@ def create_book():
 
 
 # read books
+# @ books_bp.route("", methods = ["GET"])
+# def handle_books():
+#     books = Book.query.all() # will return a list of instances of books
+#     books_response = []
+#     for book in books:
+#         # Print an Object’s Attributes by dir() or vars()
+#         # attributes = vars(book)
+#         # print(attributes)
+#         books_response.append(
+#             {
+#                 "id": book.id,
+#                 "title": book.title,
+#                 "description": book.description
+#             }
+#         )
+#     return jsonify(books_response)
+
+
+# read books by query param
 @ books_bp.route("", methods = ["GET"])
-def handle_books():
-    books = Book.query.all() # will return a list of instances of books
+def read_all_books():
+    # query by title
+    # title_query = request.args.get("title")
+    # if title_query:
+    #     books = Book.query.filter_by(title = title_query)
+    # else:
+    #     books = Book.query.all()
+    
+    # query by sort and sort the data
+    # sort_query = request.args.get("sort")
+    # if sort_query == "asc":
+    #     books = Book.query.order_by(Book.title.asc())
+    # if sort_query == "desc":
+    #     books = Book.query.order_by(Book.title.desc())
+        
+    #query by title and sort the data
+    sort_query = request.args.get("sort")
+    title_query = request.args.get("title")
+    if title_query and sort_query == "asc":
+        books = Book.query.filter_by(title = title_query).order_by(Book.title.asc())
+    elif title_query and sort_query == "desc":
+        books = Book.query.filter_by(title = title_query).order_by(Book.title.desc())
+    elif not title_query and sort_query == "asc":
+        books = Book.query.order_by(Book.title.asc())
+    elif not title_query and sort_query == "desc":
+        books = Book.query.order_by(Book.title.desc())
+    elif title_query and not sort_query:
+        books = Book.query.filter_by(title = title_query)
+    else:
+        books = Book.query.all()
+        
+    #loop into response    
     books_response = []
     for book in books:
         books_response.append(
